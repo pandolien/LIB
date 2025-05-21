@@ -1,0 +1,101 @@
+#ifndef __MDBS_H__
+#define __MDBS_H__
+#define MDBS_COIL_READ 0x01
+#define MDBS_DISCRETE_INPUTS_READ 0x02
+#define MDBS_HOLDING_REGISTERS_READ 0x03
+#define MDBS_INPUT_REGISTERS_READ 0x04
+#define MDBS_SINGLE_COIL_WIRTE 0x05
+#define MDBS_SINGLE_REGISTERS_WIRTE 0x06
+#define MDBS_MULTY_COIL_WIRTE 0x0f
+#define MDBS_MULTY_REGISTERS_WIRTE 0x10
+
+#define MDBS_ERROR_UNAVAILABLE_FUNCTION_CODE 0x01
+#define MDBS_ERROR_WRONG_FUNCTION_CODE 0x02
+
+#define MDBS_ERROR_RECV_DIFFERENT_UNIT_ID 0x01
+#define MDBS_ERROR_RECV_DIFFERENT_FUNCTION_CODE 0x02
+#define MDBS_ERROR_RECV_DATA_ERROR_OCCERRENCE 0x03
+
+//typedef bool BOOL;
+typedef unsigned char BYTE;
+typedef unsigned short WORD;
+typedef unsigned int DWARD;
+typedef struct{
+    WORD TRS_ID;
+    WORD PRTC_ID;
+    WORD LENGTH;
+    BYTE UNIT_ID;
+    BYTE FUNC_CODE;
+}MDBS_HDR;
+
+typedef struct{
+    WORD ADDRESS;
+    WORD QUANTITY;
+}MDBS_C_READ_BODY;
+typedef struct{
+    BYTE BYTE_CNT;
+    BYTE *DT;
+}MDBS_C_READ_RECV_BODY;
+typedef struct{
+    WORD ADDRESS;
+    WORD QUANTITY;
+}MDBS_DI_READ_BODY;
+typedef struct{
+    BYTE BYTE_CNT;
+    BYTE *DT;
+}MDBS_DI_READ_RECV_BODY;
+typedef struct{
+    WORD ADDRESS;
+    WORD QUANTITY;
+}MDBS_HR_READ_BODY;
+typedef struct{
+    BYTE BYTE_CNT;
+    WORD *DT;
+}MDBS_HR_READ_RECV_BODY;
+typedef struct{
+    WORD ADDRESS;
+    WORD QUANTITY;
+}MDBS_IR_READ_BODY;
+typedef struct{
+    BYTE BYTE_CNT;
+    WORD *DT;
+}MDBS_IR_READ_RECV_BODY;
+
+typedef struct{
+    WORD ADDRESS;
+    WORD DT;
+}MDBS_SC_WRITE_BODY;
+typedef struct{
+    WORD ADDRESS;
+    WORD DT;
+}MDBS_SR_WRITE_BODY;
+typedef struct{
+    WORD ADDRESS;
+    WORD QUANTITY;
+    BYTE BYTE_CNT;
+    BYTE *DT;
+}MDBS_MC_WRITE_BODY;
+typedef struct{
+    WORD ADDRESS;
+    WORD QUANTITY;
+    BYTE BYTE_CNT;
+    WORD *DT;
+}MDBS_MR_WRITE_BODY;
+typedef struct{
+    WORD ADDRESS;
+    WORD DT;
+}MDBS_SC_WRITE_RECV_BODY;
+typedef struct{
+    WORD ADDRESS;
+    WORD DT;
+}MDBS_SR_WRITE_RECV_BODY;
+typedef struct{
+    WORD ADDRESS;
+    WORD QUANTITY;
+}MDBS_MC_WRITE_RECV_BODY;
+typedef struct{
+    WORD ADDRESS;
+    WORD QUANTITY;
+}MDBS_MR_WRITE_RECV_BODY;
+
+#endif
