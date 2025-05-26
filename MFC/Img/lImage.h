@@ -4,7 +4,7 @@
 #include <3d/dhVector.h>
 #include "lPTRList.h"
 typedef struct {
-	int u, v;
+	int u, v,ch;
 }IMG_LOCATION;
 class lImage {
 public:
@@ -36,6 +36,9 @@ public:
 	unsigned char& In(int, int);
 	unsigned char Out(int, int, int);
 public:
-	void FAST(lPTRList*,float trd = 20,int cnt = 12);
+	unsigned char* ConvertGDIFormat( );
+	void Draw(CDC*, int x, int y);
+public:
+	void FAST(lPTRList*,unsigned char th = 20,int cnt = 12);
 };
 #endif

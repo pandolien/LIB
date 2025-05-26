@@ -211,12 +211,93 @@ unsigned char lImage::Out(int i, int j , int k)
 	return buf[(i*w+j) * bpp +k];
 }
 
-void lImage::FAST(lPTRList*list , float trd, int cnt)
+unsigned char* lImage::ConvertGDIFormat()
+{
+	int rs = w * bpp;
+	int stride = ((rs + 3) / 4) * 4;
+	int i, j;
+	unsigned char* gdi = new unsigned char[stride*h];
+	memset(gdi, 0, stride * h);
+	for (i = 0; i < h; i++) {
+		unsigned char* bufline = buf + i * rs;
+		unsigned char* gdiline = gdi +  i * stride;
+		for (j = 0; j < w; j++) {
+			int bj = j * bpp;
+			int gj = j * bpp;
+			if (bpp == 3) {
+				gdiline[gj + 0] = bufline[bj + 2];
+				gdiline[gj + 1] = bufline[bj + 1];
+				gdiline[gj + 2] = bufline[bj + 0];
+			}
+			else if (bpp == 4) {
+				gdiline[gj + 0] = bufline[bj + 2];
+				gdiline[gj + 1] = bufline[bj + 1];
+				gdiline[gj + 2] = bufline[bj + 0];
+				gdiline[gj + 3] = bufline[bj + 3];
+			}
+			else {
+				gdiline[j] = bufline[j];
+			}
+		}
+	}
+	return gdi;
+}
+
+void lImage::Draw(CDC* pDC, int x, int y)
+{
+	if (buf == NULL)return;
+	if (pDC == NULL)return;
+	BITMAPINFO bmi;
+	unsigned char* gdi;
+	ZeroMemory(&bmi, sizeof(BITMAPINFO));
+	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bmi.bmiHeader.biWidth = w;
+	bmi.bmiHeader.biHeight = -h; 
+	bmi.bmiHeader.biPlanes = 1;
+	bmi.bmiHeader.biBitCount = bpp * 8;
+	bmi.bmiHeader.biCompression = BI_RGB;
+	gdi = this->ConvertGDIFormat();
+	::StretchDIBits(
+		pDC->GetSafeHdc(),
+		x, y, w, h,            // 출력 위치와 크기
+		0, 0, w, h,            // 원본 이미지 위치와 크기
+		gdi,
+		&bmi,
+		DIB_RGB_COLORS,
+		SRCCOPY
+	);
+	delete[](gdi);
+}
+
+void lImage::FAST(lPTRList*list , unsigned char th, int cnt)
 {
 	list->RemoveAll();
-	int i, j,k;
-	lImage Neighber;
-	for (i = 0; i < this->h; i++) {}
+	int i, j,k,l;
+	float x[] = { -1,0,1,2,3,3,3,2,1,0,-1,-2,-3,-3,-3,-2 };
+	float y[] = { -3,-3,-3,-2,-1,0,1,2,3,3,3,2,1,0,-1,-2};
+	int w, d;
+	unsigned char mv,bv;
+	IMG_LOCATION* FAST_POINT;
+	for (i = 3; i < this->h-3; i++) 
+	for (j = 3; j < this->w - 3; j++)
+	for (k = 0; k < bpp; k++) {
+		w = 0;
+		d = 0;
+		mv = Out(i, j, k);
+		for (l = 0; l < 16; l++) {
+			bv = Out(x[l] + i, y[l] + j, k);
+			if (bv > mv + th) { w += 1; }
+			if (bv < mv - th) { d += 1; }
+		}
+		if (w > cnt || d > cnt) {
+			FAST_POINT = new IMG_LOCATION;
+			FAST_POINT->u = j;
+			FAST_POINT->v = i;
+			FAST_POINT->ch = k;
+			list->AddTail(FAST_POINT);
+			FAST_POINT = NULL;
+		}
+	}
 	return;
 }
 
